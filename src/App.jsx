@@ -1,7 +1,8 @@
+import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import NewProject from "./components/NewProject";
 import NoProjectSelected from "./components/NoProjectSelected";
-import { useState } from "react";
+import SelectedProject from "./components/SelectedProject";
 
 function App() {
   const [projectsState, setProjectsState] = useState({
@@ -44,23 +45,36 @@ function App() {
   function handleSelectProject(id){
     setProjectsState(prevState => {
       return{
-        ...projectsState,
+        ...prevState,
         selectedProjectId : id
       }
     })
   }
 
-  let content;
+  function handleDeleteProject(){
+    setProjectsState(prevState => {
+      return{
+        ...prevState,
+        selectedProjectId : undefined, 
+        //elimino il progetto attuale sul quale ho cliccato delete dall'array dello state
+        //filtro solo quello che ha lo stesso id del precedente state, così elimino solo lui e non serve neanche l'id in ingresso
+        projects : prevState.projects.filter((project) => project.id !== prevState.selectedProjectId)
+      }
+    })
+  }
+
+  //cerco l'elemento nell'array projects dell'oggetto projectsState usando l'id
+  const currentProject = projectsState.projects.find(project => project.id === projectsState.selectedProjectId)
+
+  //in base al fatto che un progetto sia selezionato o meno renderizzo 3 componenti diversi
+  let content = <SelectedProject  project={currentProject} onDelete={handleDeleteProject} />;
   
   if(projectsState.selectedProjectId === undefined){
     content = <NoProjectSelected onStartAddProject={handleStartAddProject} />
   } else if(projectsState.selectedProjectId === null){
     content = <NewProject onAddNew={handleAddNewProject} onCancel={handleCancelAddProject}/>
-  } /* else{
-    content = <ProjectSelected />
-  } */
-  
-  console.log(projectsState)
+  }
+ 
   return (
     <main className="h-screen my-8 flex gap-8">
       <Sidebar onStartAddProject={handleStartAddProject} projects={projectsState.projects} onSelect={handleSelectProject} />
