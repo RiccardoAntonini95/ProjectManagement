@@ -10,23 +10,36 @@ function App() {
   })
 
   function handleStartAddProject() {
-    setProjectsState(prevProjectState => {
-      console.log("cliccato")
+    setProjectsState(prevState => {
       return{
-        ...prevProjectState,
+        ...prevState,
         selectedProjectId: null
       }
     })
   }
 
-  let content;
+  function handleAddNewProject(projectData) { //mi aspetto un oggetto in ingresso con e chiavi title, desc e duedate e i values rispettivi
+    setProjectsState(prevState => {
+      const newProject = {
+        ...projectData,
+        id: Math.random() //teoricamente è sbagliato perchè potrei ottenere più volte lo stesso numero ma per questo progettino lo lascio così
+      }
+      return {
+        ...prevState,
+        projects: [...prevState.projects, newProject]
+      }
+    })
+  }
 
+  let content;
+  
   if(projectsState.selectedProjectId === undefined){
     content = <NoProjectSelected onStartAddProject={handleStartAddProject} />
   } else if(projectsState.selectedProjectId === null){
-    content = <NewProject />
+    content = <NewProject onAddNew={handleAddNewProject}/>
   }
-
+  
+  console.log(projectsState)
   return (
     <main className="h-screen my-8 flex gap-8">
       <Sidebar onStartAddProject={handleStartAddProject}/>
