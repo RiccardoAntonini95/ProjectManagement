@@ -1,7 +1,9 @@
 import Input from "./Input"
 import { useRef } from "react"
+import Modal from "./Modal";
 
-export default function NewProject({onAddNew}) {
+export default function NewProject({onAddNew, onCancel}) {
+    const modal = useRef();
     const title = useRef();
     const description = useRef();
     const dueDate = useRef();
@@ -11,7 +13,14 @@ export default function NewProject({onAddNew}) {
         const enteredDescription = description.current.value
         const enteredDueDate = dueDate.current.value
 
-        // validation
+        if(
+            enteredTitle.trim() === '' ||
+            enteredDescription.trim() === '' ||
+            enteredDueDate.trim() === '' 
+        ) {
+            modal.current.open();
+            return;
+        }
 
         onAddNew({
             title: enteredTitle,
@@ -21,17 +30,34 @@ export default function NewProject({onAddNew}) {
 
     }
 
-    return(
+
+    return (
+      <>
+        <Modal ref={modal} buttonCaption="Close" >
+            <h2 className="text-xl font-bold text-stone-500 my-4">Invalid Input</h2>
+            <p className="text-stone-400 mb-4">Please make sure you provide valid input for every field</p>
+        </Modal>
         <div className="w-[35rem] mt-16">
-            <menu className="flex items-center justify-end gap-4 my-4">
-                <li><button className="text-stone-800 hover:text-stone-950">Cancel</button></li>
-                <li><button className="bg-stone-800 text-stone-50 hover:bg-stone-950 px-6 py-2 rounded-md" onClick={handleSave}>Save</button></li>
-            </menu>
-            <div>
-                <Input type="text" label='Title'  ref={title} /> 
-                <Input label='Description' textarea ref={description} /> 
-                <Input type="date" label='Due date' ref={dueDate} /> 
-            </div>
+          <menu className="flex items-center justify-end gap-4 my-4">
+            <li>
+              <button className="text-stone-800 hover:text-stone-950" onClick={onCancel}>
+                Cancel
+              </button>
+            </li>
+            <li>
+              <button
+                className="bg-stone-800 text-stone-50 hover:bg-stone-950 px-6 py-2 rounded-md"
+                onClick={handleSave}>
+                Save
+              </button>
+            </li>
+          </menu>
+          <div>
+            <Input type="text" label="Title" ref={title} />
+            <Input label="Description" textarea ref={description} />
+            <Input type="date" label="Due date" ref={dueDate} />
+          </div>
         </div>
-    )
+      </>
+    );
 }
